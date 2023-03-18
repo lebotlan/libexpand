@@ -12,7 +12,7 @@ spaces that try to expand as much as possible (like \hfill in latex).
 
 A problem is a system of non-circular equations of the form
 
-```python
+```bash
   b1 + cst + k1.h1 + k2.h2 + ... + kn.hn ⩽ b2
   ...
 ```
@@ -49,7 +49,7 @@ It is not a 2D Tetris solver.
 
 ### Layout system example: evenly spaced bvars, sharing a 40-wide space:
 
-```python
+```bash
  b1 + 40 ⩽ b4   ## b4 is at least 40 spaces to the right of b1.
  
  b1 + h1 ⩽ b2   ## b2 and b3 are put between b1 and b4, separated by hvars h1, h2, h3.
@@ -126,7 +126,7 @@ Here is how to express:
    `a_i + h2 ⩽ b_i`  where h2 has a max value.
 
  * Columns that share some available space. The middle column takes twice the space.
-```python
+```bash
    a1 + h2 ⩽ b1     b1 + 2 ⩽ a2
    a2 + 2.h2 ⩽ b2   b2 + 2 ⩽ a3
    a3 + h2 ⩽ b3
