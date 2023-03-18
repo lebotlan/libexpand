@@ -4,7 +4,7 @@ Libexpand is a library used to build and solve 1.5D layout problems.
 It can typically compute the layout of tables, that is, the width of each column and height of each row,
 according to their content, spacing, alignment, and other constraints (including multi-row, multi-column cells).
 
-The name libexpand comes from the tricky part of the solving algorithm: it handles expansion variables, that is,
+The name **libexpand** comes from the tricky part of the solving algorithm: it handles *expansion* variables, that is,
 spaces that try to expand as much as possible (like \hfill in latex).
 
 
@@ -33,7 +33,7 @@ Such equations are built using the following OCaml modules, to be found in Libex
 
 ## Layout as equations
 
-An equation captures a 1D constraint, e.g. horizontal constraint *or* vertical constraint (Libexpand computes positions and sizes, it cannot solve Tetris problems).
+An equation captures a 1D constraint, e.g. horizontal constraint *or* vertical constraint (libexpand computes positions and sizes, it cannot solve Tetris problems).
 
  - A bvar is a variable holding a position (e.g. the left side or right side of a box).
  - A hvar is an expansion variable that can be used to put space between items, or to left-align, center, or right-align a box content.
@@ -47,6 +47,7 @@ It is not a 2D Tetris solver.
 
 ### Layout system example: evenly spaced bvars, sharing a 40-wide space:
 
+```python
  b1 + 40 <= b4   ## b4 is at least 40 spaces to the right of b1.
  
  b1 + h1 <= b2   ## b2 and b3 are put between b1 and b4, separated by hvars h1, h2, h3.
@@ -56,6 +57,7 @@ It is not a 2D Tetris solver.
 
   b1 <--h1--> b2 <--h2--> b3 <--h3--> b4
      <------------ 40 -------------->
+```
 
 
 ## Meaning of variables 
@@ -80,7 +82,7 @@ The set of equations must be a dag (there must be no circular dependency between
 
 ## Usage
 
-Build a dag using the modules in `Constraints`. Solve it using `Solver`.
+Build a dag using the modules in `Constraints`. Then solve it using `Solver`.
 
 The dune libraries are:
 
@@ -108,27 +110,27 @@ Each column (or say, row) is associated to two variables: a_i = x-position of th
 Here is how to express:
 
  * Separation between columns
- fixed: b_i + k <= b_(i+1)
- extensible: b_i + h1 <= b_(i+1)
+   * fixed: `b_i + k <= b_(i+1)`
+   * extensible: `b_i + h1 <= b_(i+1)`
 
- * Fixed size of a column: a_i + content-width <= b_i
+ * Fixed size of a column: `a_i + content-width <= b_i`
 
- * Multi-column: a_i + content-width <= b_j
+ * Multi-column:  a_i + content-width <= b_j`
 
- * Center the content of a column: a_i + h1 + content_width + h1' <= b_i
+ * Center the content of a column: `a_i + h1 + content_width + h1' <= b_i`
 (the value of h1 and h1' in the solution provides the left and right spacing)
 
  * Column that expand as much as possible, until a given max width
-   a_i + h2 <= b_i  where h2 has a max value.
+   `a_i + h2 <= b_i`  where h2 has a max value.
 
  * Columns that share some available space. The middle column takes twice the space.
-
+```python
    a1 + h2 <= b1     b1 + 2 <= a2
    a2 + 2.h2 <= b2   b2 + 2 <= a3
    a3 + h2 <= b3
 
    a1 + 80 <= b3     # Total width
-
+```
 
 
 ## Test
