@@ -99,7 +99,7 @@ The Ocaml modules are:
 
 ## Examples
 
-See test/testlib.ml
+See test/testlib.ml.
 You may run `./testlib.exe | less` to understand what the library does.
 
 Also, the dag are exported as graphs in subdirectory Graphs/. Use make in Graphs/ (requires graphviz).
@@ -139,4 +139,14 @@ Here is how to express:
 
 make
 ./testlib.exe    should raise no assertion failure
+
+
+## How does it work?
+
+The algorithm is iterative: it computes a solution until a fixpoint is reached. 
+Yet, constraint propagation is not too dumb, so that a solution is usually found in one or two iterations on
+most examples, even on tricky ones.
+
+Details are in `solve_phi.mli`
+
 
