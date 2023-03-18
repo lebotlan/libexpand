@@ -117,7 +117,7 @@ Here is how to express:
 
  * Fixed size of a column: `a_i + content-width ⩽ b_i`
 
- * Multi-column:  a_i + content-width ⩽ b_j`
+ * Multi-column:  `a_i + content-width ⩽ b_j`
 
  * Center the content of a column: `a_i + h1 + content_width + h1' ⩽ b_i`
 (the value of h1 and h1' in the solution provides the left and right spacing)
