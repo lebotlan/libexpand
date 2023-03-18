@@ -7,12 +7,13 @@ according to their content, spacing, alignment, and other constraints (including
 The name **libexpand** comes from the tricky part of the solving algorithm: it handles *expansion* variables, that is,
 spaces that try to expand as much as possible (like \hfill in latex).
 
+⩽
 
 ## Equations
 
 A problem is a system of non-circular equations of the form
 
-  b1 + cst + k1.h1 + k2.h2 + ... + kn.hn <= b2
+  b1 + cst + k1.h1 + k2.h2 + ... + kn.hn ⩽ b2
   ...
 
 where
@@ -27,7 +28,7 @@ Such equations are built using the following OCaml modules, to be found in Libex
  - `Hvar` to create hvars
  - `Bvar` to create bvars
  - `Expr` to build expressions (b1 + cst + k1.h1 + k2.h2 + ... + kn.hn)
- - `Dag` to build the system of equations (expr <= b2)
+ - `Dag` to build the system of equations (expr ⩽ b2)
  - `Level` to handle the level (that is the strength) of bvars and hvars
 
 
@@ -48,11 +49,11 @@ It is not a 2D Tetris solver.
 ### Layout system example: evenly spaced bvars, sharing a 40-wide space:
 
 ```python
- b1 + 40 <= b4   ## b4 is at least 40 spaces to the right of b1.
+ b1 + 40 ⩽ b4   ## b4 is at least 40 spaces to the right of b1.
  
- b1 + h1 <= b2   ## b2 and b3 are put between b1 and b4, separated by hvars h1, h2, h3.
- b2 + h2 <= b3
- b3 + h3 <= b4
+ b1 + h1 ⩽ b2   ## b2 and b3 are put between b1 and b4, separated by hvars h1, h2, h3.
+ b2 + h2 ⩽ b3
+ b3 + h3 ⩽ b4
 
 
   b1 <--h1--> b2 <--h2--> b3 <--h3--> b4
@@ -77,7 +78,7 @@ Infinitely expansible hvars are detected and fixed to a predefined value. These 
 
 ## It must be a DAG
 
-The set of equations must be a dag (there must be no circular dependency between bvars, even legit), e.g.  b1 - 6 <= b2  and b2 + 3 <= b1 is forbidden.
+The set of equations must be a dag (there must be no circular dependency between bvars, even legit), e.g.  b1 - 6 ⩽ b2  and b2 + 3 ⩽ b1 is forbidden.
 
 
 ## Usage
@@ -110,26 +111,26 @@ Each column (or say, row) is associated to two variables: a_i = x-position of th
 Here is how to express:
 
  * Separation between columns
-   * fixed: `b_i + k <= b_(i+1)`
-   * extensible: `b_i + h1 <= b_(i+1)`
+   * fixed: `b_i + k ⩽ b_(i+1)`
+   * extensible: `b_i + h1 ⩽ b_(i+1)`
 
- * Fixed size of a column: `a_i + content-width <= b_i`
+ * Fixed size of a column: `a_i + content-width ⩽ b_i`
 
- * Multi-column:  a_i + content-width <= b_j`
+ * Multi-column:  a_i + content-width ⩽ b_j`
 
- * Center the content of a column: `a_i + h1 + content_width + h1' <= b_i`
+ * Center the content of a column: `a_i + h1 + content_width + h1' ⩽ b_i`
 (the value of h1 and h1' in the solution provides the left and right spacing)
 
  * Column that expand as much as possible, until a given max width
-   `a_i + h2 <= b_i`  where h2 has a max value.
+   `a_i + h2 ⩽ b_i`  where h2 has a max value.
 
  * Columns that share some available space. The middle column takes twice the space.
 ```python
-   a1 + h2 <= b1     b1 + 2 <= a2
-   a2 + 2.h2 <= b2   b2 + 2 <= a3
-   a3 + h2 <= b3
+   a1 + h2 ⩽ b1     b1 + 2 ⩽ a2
+   a2 + 2.h2 ⩽ b2   b2 + 2 ⩽ a3
+   a3 + h2 ⩽ b3
 
-   a1 + 80 <= b3     # Total width
+   a1 + 80 ⩽ b3     # Total width
 ```
 
 
