@@ -7,21 +7,22 @@ according to their content, spacing, alignment, and other constraints (including
 The name **libexpand** comes from the tricky part of the solving algorithm: it handles *expansion* variables, that is,
 spaces that try to expand as much as possible (like \hfill in latex).
 
-⩽
 
 ## Equations
 
 A problem is a system of non-circular equations of the form
 
+```python
   b1 + cst + k1.h1 + k2.h2 + ... + kn.hn ⩽ b2
   ...
+```
 
 where
 
  - cst is a numeral constant
  - b1, b2 are position variables (aka box variables, bvars)
  - h1, ... hn are expansion variables (aka hfill variables, hvars)
- - k1 is the coefficient of h1 (and ki is the coef of hi)   k1.h1 is equivalent to h1 + h1 + ...  k1 times if h1 has no minimal and no maximal bound.
+ - k1 is the coefficient of h1 (and ki is the coef of hi)   `k1.h1` is equivalent to `h1 + h1 + ... `  k1 times if h1 has no minimal and no maximal bound.
 
 Such equations are built using the following OCaml modules, to be found in Libexpand.Constraints:
 
@@ -78,7 +79,7 @@ Infinitely expansible hvars are detected and fixed to a predefined value. These 
 
 ## It must be a DAG
 
-The set of equations must be a dag (there must be no circular dependency between bvars, even legit), e.g.  b1 - 6 ⩽ b2  and b2 + 3 ⩽ b1 is forbidden.
+The set of equations must be a dag (there must be no circular dependency between bvars, even legit), e.g.  `b1 - 6 ⩽ b2`  and `b2 + 3 ⩽ b1` is forbidden.
 
 
 ## Usage
