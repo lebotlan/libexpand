@@ -31,15 +31,15 @@ b1                      b2
 
 The corresponding system of equations:
 
-```bash
- b1 + 23 < b2                   ## There is at least a 23-wide space between b1 and b2. 
- b1 + h1 + h2 + h3 + h4 < b2    ## The space between b1 and b2 is occupied by h1,h2,h3,h4.
+```latex
+ b1 + 23 < b2                   % There is at least a 23-wide space between b1 and b2. 
+ b1 + h1 + h2 + h3 + h4 < b2    % The space between b1 and b2 is occupied by h1,h2,h3,h4.
 ```
 
 The solution, as computed by libexpand, provides integer values for all variables b1,b2,h1,h2,h3,h4. Since b1 is unconstrained, its value is 1.
  
 A solution:
-```bash
+```latex
   b1 = 1
   b2 = 24
   h1 = 5
@@ -56,12 +56,12 @@ TODO: See [the full example in OCaml](Example1.md)
 
 ### Example 2: alignment in a table's cells.
 
-```bash
-|This line is 32 characters long.|   ## Line 1
+```latex
+|This line is 32 characters long.|   % Line 1
 |                                |
-|            Centered            |   ## Line 3
-|Left                            |   ## Line 4
-|                           Right|   ## Line 5
+|            Centered            |   % Line 3
+|Left                            |   % Line 4
+|                           Right|   % Line 5
 
 b1                                b2
 ```
@@ -76,7 +76,7 @@ The constraints associated to the table example above are:
 
 The solution computed by libexpand provided suitable values for b1,b2,h1,h2,h3,h4.
  
- ```bash
+ ```latex
   b1 = 1
   b2 = 33
   h1 = 12
