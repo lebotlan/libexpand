@@ -1,55 +1,56 @@
 # Libexpand, a layout solving algorithm
 
-Libexpand is a library used to build and solve 1.5D layout problems.
+[Libexpand](https://github.com/lebotlan/libexpand) is a library used to build and solve 1.5D layout problems.
 It can typically compute the layout of tables, that is, the width of each column and height of each row,
 according to their content, spacing, alignment, and other constraints (including multi-row, multi-column cells).
 
 The name **libexpand** comes from the tricky part of the solving algorithm: it handles *expansion* variables, that is,
 spaces that try to expand as much as possible (like \hfill in latex).
 
+## Documentation
+
+
+
 ## Overview
 
 Layout constraints are collected in a set of inequations, which are then solved by libexpand.
 
-### Example 1: share a 23-wide space between 4 elements.
+### Example 1: share a 22-wide space between 4 elements.
 
 Consider this example:
 
 ```latex
-|This space width is 23.|   % Two bars separated by a 23-wide space.
-|                       |
-|<h1><h2><h3><h4>       |   % Four elements that try to share the space.
+|This space width is 22|   % Two bars separated by a 22-wide space.
+|                      |
+|<h1><h2><h3><h4>      |   % Four elements that try to share the space.
 
-b1                      b2
+b1                     b2
 ```
 
 - Variable b1 holds the position of the left bar.
 - Variable b2 holds the position of the right bar.
 
 - b1, b2 are *position* variables - they tend to be as small as possible
-- h1,h2,h3,h4 are *expansion* variables - they tend to be as large as possible, but cannot increase the value of variable b2.
+- h1, h2, h3, h4 are *expansion* variables - they tend to be as large as possible, but cannot increase b2's value.
 
-The corresponding system of equations:
+The corresponding system of inequations:
 
 ```latex
- b1 + 23 < b2                   % There is at least a 23-wide space between b1 and b2. 
+ b1 + 22 < b2                   % There is at least a 22-wide space between b1 and b2. 
  b1 + h1 + h2 + h3 + h4 < b2    % The space between b1 and b2 is occupied by h1,h2,h3,h4.
 ```
 
-The solution, as computed by libexpand, provides integer values for all variables b1,b2,h1,h2,h3,h4. Since b1 is unconstrained, its value is 1.
+The solution, as computed by libexpand, provides integer values for all variables b1, b2, h1, h2, h3, and h4. Since b1 is unconstrained, its value is 1.
  
 A solution:
 ```latex
-  b1 = 1
-  b2 = 24
-  h1 = 5
-  h2 = 4
-  h3 = 5
-  h4 = 5
+  b1 = 1  b2 = 23
+  h1 = 6  h2 = 5  h3 = 6  h4 = 5
+  
+  |< h1 ><h2 >< h3 ><h4 >|
 ```
 
-The 23-wide space is shared between h1,h2,h3 and h4 as evenly as possible. Admissible solutions are such that h1,h2,h3 and h4 have a distance of at most 1,
-and a sum of 23.
+The 22-wide space is shared between h1, h2, h3 and h4 as evenly as possible. Admissible solutions are such that h1,h2,h3 and h4 have a distance of at most 1, and a sum of 22.
 
 TODO: See [the full example in OCaml](Example1.md)
 
@@ -77,12 +78,8 @@ The constraints associated to the table example above are:
 The solution computed by libexpand provided suitable values for b1,b2,h1,h2,h3,h4.
  
  ```latex
-  b1 = 1
-  b2 = 33
-  h1 = 12
-  h2 = 12
-  h3 = 28
-  h4 = 27
+  b1 = 1  b2 = 33
+  h1 = 12  h2 = 12  h3 = 28  h4 = 27
 ```
  
  TODO: See [the full example in OCaml](Example2.md)
@@ -100,7 +97,7 @@ The solution computed by libexpand provided suitable values for b1,b2,h1,h2,h3,h
 Read [Equations.md](Equations.md)
 
 
-## Usage and documentation
+## Usage
 
 Build a dag using the modules in `Constraints`. Then solve it using `Solver`.
 
@@ -114,7 +111,7 @@ The Ocaml modules are:
  - Constraints.Dag, Constraints.Bvar, Constraints.Hvar, ...
  - Solve.Solver
 
-TODO: doc
+
 
 
 ## Examples
