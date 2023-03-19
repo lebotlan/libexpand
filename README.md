@@ -16,7 +16,7 @@ spaces that try to expand as much as possible (like \hfill in latex).
 Layout constraints are collected in a set of inequations, which are then solved by libexpand. Horizontal
 and vertical constraints are separated.
 
-### Example 1: share a 23-wide horizontal space between 4 elements.
+### Example 1: share a 22-wide horizontal space between 4 elements.
 
 Consider this example:
 
