@@ -7,82 +7,100 @@ according to their content, spacing, alignment, and other constraints (including
 The name **libexpand** comes from the tricky part of the solving algorithm: it handles *expansion* variables, that is,
 spaces that try to expand as much as possible (like \hfill in latex).
 
+## Overview
 
-## Equations
+Layout constraints are collected in a set of inequations, which are then solved by libexpand.
 
-A problem is a system of non-circular equations of the form
+### Example 1: share a 23-wide space between 4 elements.
 
-```bash
-  b1 + cst + k1.h1 + k2.h2 + ... + kn.hn ⩽ b2
-  ...
+Consider this example:
+
+```latex
+|This space width is 23.|   % Two bars separated by a 23-wide space.
+|                       |
+|<h1><h2><h3><h4>       |   % Four elements that try to share the space.
+
+b1                      b2
 ```
 
-where
+- Variable b1 holds the position of the left bar.
+- Variable b2 holds the position of the right bar.
 
- - cst is a numeral constant
- - b1, b2 are position variables (aka box variables, bvars)
- - h1, ... hn are expansion variables (aka hfill variables, hvars)
- - k1 is the coefficient of h1 (and ki is the coef of hi)   `k1.h1` is equivalent to `h1 + h1 + ... `  k1 times if h1 has no minimal and no maximal bound.
+- b1, b2 are *position* variables - they tend to be as small as possible
+- h1,h2,h3,h4 are *expansion* variables - they tend to be as large as possible, but cannot increase the value of variable b2.
 
-Such equations are built using the following OCaml modules, to be found in Libexpand.Constraints:
-
- - `Hvar` to create hvars
- - `Bvar` to create bvars
- - `Expr` to build expressions (b1 + cst + k1.h1 + k2.h2 + ... + kn.hn)
- - `Dag` to build the system of equations (expr ⩽ b2)
- - `Level` to handle the level (that is the strength) of bvars and hvars
-
-
-## Layout as equations
-
-An equation captures a 1D constraint, e.g. horizontal constraint *or* vertical constraint (libexpand computes positions and sizes, it cannot solve Tetris problems).
-
- - A bvar is a variable holding a position (e.g. the left side or right side of a box).
- - A hvar is an expansion variable that can be used to put space between items, or to left-align, center, or right-align a box content.
-
-Equations may express for example that some items must be vertically aligned (using the same bvar for representing the x-position of the items), or,
-as another example, that inner items of a box should be evenly spaced (using hvars between bvars).
-
-Equations can express layout constraints on different layers, which can fork and join at different points. This is why we consider it as a 1.5D layout problem.
-It is not a 2D Tetris solver.
-
-
-### Layout system example: evenly spaced bvars, sharing a 40-wide space:
+The corresponding system of equations:
 
 ```bash
- b1 + 40 ⩽ b4   ## b4 is at least 40 spaces to the right of b1.
+ b1 + 23 < b2                   ## There is at least a 23-wide space between b1 and b2. 
+ b1 + h1 + h2 + h3 + h4 < b2    ## The space between b1 and b2 is occupied by h1,h2,h3,h4.
+```
+
+The solution, as computed by libexpand, provides integer values for all variables b1,b2,h1,h2,h3,h4. Since b1 is unconstrained, its value is 1.
  
- b1 + h1 ⩽ b2   ## b2 and b3 are put between b1 and b4, separated by hvars h1, h2, h3.
- b2 + h2 ⩽ b3
- b3 + h3 ⩽ b4
-
-
-  b1 <--h1--> b2 <--h2--> b3 <--h3--> b4
-     <------------ 40 -------------->
+A solution:
+```bash
+  b1 = 1
+  b2 = 24
+  h1 = 5
+  h2 = 4
+  h3 = 5
+  h4 = 5
 ```
 
+The 23-wide space is shared between h1,h2,h3 and h4 as evenly as possible. Admissible solutions are such that h1,h2,h3 and h4 have a distance of at most 1,
+and a sum of 23.
 
-## Meaning of variables 
-
- - bvars (= x-position) try to be as small as possible
- - hvars (= spacing) try to be as large as possible.
-
-Each bvar or hvar has a *level*. A hvar of level l wins against hvars or bvars of lower levels.
-
-When several hvars of the same level compete, the available space is shared between them.
-
-Hvars can have a minimal and maximal value.
-
-Infinitely expansible hvars are detected and fixed to a predefined value. These are unbounded hvars that are not blocked by any bvar of higher level (this should be considered as a design mistake).
+TODO: See [the full example in OCaml](Example1.md)
 
 
+### Example 2: alignment in a table's cells.
 
-## It must be a DAG
+```bash
+|This line is 32 characters long.|   ## Line 1
+|                                |
+|            Centered            |   ## Line 3
+|Left                            |   ## Line 4
+|                           Right|   ## Line 5
 
-The set of equations must be a dag (there must be no circular dependency between bvars, even legit), e.g.  `b1 - 6 ⩽ b2`  and `b2 + 3 ⩽ b1` is forbidden.
+b1                                b2
+```
+
+The constraints associated to the table example above are:
+- Line 1 : `b1 + 32 < b2`
+- Line 3 : `b1 + h1 + 8 + h2 < b2`  where h1,h2 are expansion variables used to add space around the centered text.
+- Line 4 : `b1 + 4 + h3 < b2`   the expansion variable takes the space available after the text.
+- Line 5 : `b1 + h4 + 5 < b2`   the expansion variable takes the space available before the text(*).
+
+(*) the equation itself does not care much about left or right: equations for Line 4 and Line 5 are actually similar.
+
+The solution computed by libexpand provided suitable values for b1,b2,h1,h2,h3,h4.
+ 
+ ```bash
+  b1 = 1
+  b2 = 33
+  h1 = 12
+  h2 = 12
+  h3 = 28
+  h4 = 27
+```
+ 
+ TODO: See [the full example in OCaml](Example2.md)
+
+### What else?
+
+- Expansion variables can have a **minimal** and **maximal** size.
+- Position variable and expansion variables have a **level**. A variable can be pushed by variables with a level that is higher or equal.
+- Constraints can be **deeply nested** - it is possible to model tables in tables in a table.
+- The system is expressive enough to model multi-column cells, or say, alignment cosntraints between elements located in different tables.
 
 
-## Usage
+## Equations, variables, and modeling
+
+Read [Equations.md](Equations.md)
+
+
+## Usage and documentation
 
 Build a dag using the modules in `Constraints`. Then solve it using `Solver`.
 
@@ -96,6 +114,8 @@ The Ocaml modules are:
  - Constraints.Dag, Constraints.Bvar, Constraints.Hvar, ...
  - Solve.Solver
 
+TODO: doc
+
 
 ## Examples
 
@@ -105,34 +125,7 @@ You may run `./testlib.exe | less` to understand what the library does.
 Also, the dag are exported as graphs in subdirectory Graphs/. Use make in Graphs/ (requires graphviz).
 
 
-## Table examples
 
-In order to express the constraints of a table layout, use a system for x coordinates, and another one for y coordinates.
-Each column (or say, row) is associated to two variables: a_i = x-position of the column left side  b_i = x-position of the column right side.
-Here is how to express:
-
- * Separation between columns
-   * fixed: `b_i + k ⩽ b_(i+1)`
-   * extensible: `b_i + h1 ⩽ b_(i+1)`
-
- * Fixed size of a column: `a_i + content-width ⩽ b_i`
-
- * Multi-column:  `a_i + content-width ⩽ b_j`
-
- * Center the content of a column: `a_i + h1 + content_width + h1' ⩽ b_i`
-(the value of h1 and h1' in the solution provides the left and right spacing)
-
- * Column that expand as much as possible, until a given max width
-   `a_i + h2 ⩽ b_i`  where h2 has a max value.
-
- * Columns that share some available space. The middle column takes twice the space.
-```bash
-   a1 + h2 ⩽ b1     b1 + 2 ⩽ a2
-   a2 + 2.h2 ⩽ b2   b2 + 2 ⩽ a3
-   a3 + h2 ⩽ b3
-
-   a1 + 80 ⩽ b3     # Total width
-```
 
 
 ## Test
